@@ -5,29 +5,31 @@ from datetime import date
 
 def index(request):
     categories = models.Category.objects.all()
-    liked = models.WishList.objects.filter(user=request.user)
     
     # way 1
-    # reviews = models.Review.objects.all()
-    # products = models.Product.objects.all()
-    # result = []
-    # for i in products:
-    #     data = models.WishList.objects.filter(product=x, user=request.user)
-    #     if data:
-    #         i.is_like = True
-    #     else:
-    #         i.is_like = False
-    #     result.append(i)
+    reviews = models.Review.objects.all()
+    products = models.Product.objects.all()
+    result = []
+    if request.user.is_authenticated:
+        for i in products:
+            data = models.WishList.objects.filter(product=i, user=request.user)
+            if data:
+                i.is_like = True
+            else:
+                i.is_like = False
+            result.append(i)
+    else:
+        result = models.WishList.objects.all()
 
     # way2
-    def map_fun(x):
-        x.is_like = bool(models.WishList.objects.filter(product=x, user=request.user))
-        return x
+    # def map_fun(x):
+    #     x.is_like = bool(models.WishList.objects.filter(product=x, user=request.user))
+    #     return x
     
-    result = map(
-        map_fun, 
-        models.Product.objects.all()
-        )
+    # result = map(
+    #     map_fun, 
+    #     models.Product.objects.all()
+    #     )
 
 
 
@@ -42,7 +44,7 @@ def index(request):
         'products':result,
         'rating':range(1,6),
         # 'mark':mark,
-        'liked':liked,
+        # 'liked':liked,
         }
     return render(request, 'front/index.html',context)
 
